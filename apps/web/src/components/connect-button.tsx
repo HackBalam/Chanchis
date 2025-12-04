@@ -2,14 +2,34 @@
 
 import { useState, useEffect } from 'react'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { useMiniApp } from '@/contexts/miniapp-context'
 
+// Componente simple de la documentación de Celo
+export function ConnectMenu() {
+  const { isConnected, address } = useAccount();
+  const { connect, connectors } = useConnect();
+
+  if (isConnected) {
+    return (
+      <>
+        <div>You&apos;re connected!</div>
+        <div>Address: {address}</div>
+      </>
+    );
+  }
+
+  return (
+    <button type="button" onClick={() => connect({ connector: connectors[0] })}>
+      Connect
+    </button>
+  );
+}
+
+// Componente con estilos para la UI
 export function WalletConnectButton() {
   const [mounted, setMounted] = useState(false)
   const { address, isConnected } = useAccount()
   const { connect, connectors } = useConnect()
   const { disconnect } = useDisconnect()
-  const { context } = useMiniApp()
 
   useEffect(() => {
     setMounted(true)
@@ -24,11 +44,9 @@ export function WalletConnectButton() {
   }
 
   if (!isConnected) {
-    const frameConnector = connectors.find(connector => connector.id === 'frameWallet')
-    
     return (
       <button
-        onClick={() => frameConnector && connect({ connector: frameConnector })}
+        onClick={() => connect({ connector: connectors[0] })}
         type="button"
         className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
       >
@@ -39,12 +57,9 @@ export function WalletConnectButton() {
 
   return (
     <div className="flex items-center gap-2">
-      <button
-        type="button"
-        className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-3 py-2"
-      >
+      <span className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium border border-input bg-background h-10 px-3 py-2">
         Celo
-      </button>
+      </span>
 
       <button
         onClick={() => disconnect()}
