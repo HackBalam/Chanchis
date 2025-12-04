@@ -1,9 +1,11 @@
 "use client";
 import { useMiniApp } from "@/contexts/miniapp-context";
 import { sdk } from "@farcaster/frame-sdk";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAccount, useConnect, useBalance } from "wagmi";
 import Image from "next/image";
+import { ReceiveModal } from "@/components/receive-modal";
+import { SendModal } from "@/components/send-modal";
 
 // Dirección del token Chanchis (CHNC) en Celo Mainnet
 const CHANCHIS_TOKEN_ADDRESS = "0xd85E17185cC11A02c7a8C5055FE7Cb6278Df9418" as const;
@@ -12,16 +14,23 @@ export default function Home() {
   const { context, isMiniAppReady } = useMiniApp();
   const [isAddingMiniApp, setIsAddingMiniApp] = useState(false);
   const [addMiniAppMessage, setAddMiniAppMessage] = useState<string | null>(null);
-  
+  const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
+  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
+
   // Wallet connection hooks
   const { address, isConnected, isConnecting } = useAccount();
   const { connect, connectors } = useConnect();
 
   // Token balance hook for Chanchis (CHNC)
-  const { data: tokenBalance, isLoading: isBalanceLoading } = useBalance({
+  const { data: tokenBalance, isLoading: isBalanceLoading, refetch: refetchBalance } = useBalance({
     address: address,
     token: CHANCHIS_TOKEN_ADDRESS,
   });
+
+  // Callback to refresh balance after transfer
+  const handleTransferComplete = useCallback(() => {
+    refetchBalance();
+  }, [refetchBalance]);
   
   // Auto-connect wallet when miniapp is ready
   useEffect(() => {
@@ -100,6 +109,55 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Action Buttons - Receive & Send */}
+          {isConnected && (
+            <div className="mb-8 flex gap-4">
+              {/* Receive Button */}
+              <button
+                onClick={() => setIsReceiveModalOpen(true)}
+                className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex flex-col items-center gap-2"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                <span>Receive</span>
+              </button>
+
+              {/* Send Button */}
+              <button
+                onClick={() => setIsSendModalOpen(true)}
+                className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-medium py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex flex-col items-center gap-2"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                  />
+                </svg>
+                <span>Send</span>
+              </button>
             </div>
           )}
 
@@ -213,6 +271,21 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Modals */}
+      <ReceiveModal
+        isOpen={isReceiveModalOpen}
+        onClose={() => setIsReceiveModalOpen(false)}
+        address={address || ""}
+      />
+
+      <SendModal
+        isOpen={isSendModalOpen}
+        onClose={() => setIsSendModalOpen(false)}
+        userAddress={address || ""}
+        tokenBalance={tokenBalance?.formatted || "0"}
+        onTransferComplete={handleTransferComplete}
+      />
     </main>
   );
 }
