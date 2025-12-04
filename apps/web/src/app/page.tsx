@@ -2,7 +2,11 @@
 import { useMiniApp } from "@/contexts/miniapp-context";
 import { sdk } from "@farcaster/frame-sdk";
 import { useState, useEffect } from "react";
-import { useAccount, useConnect } from "wagmi";
+import { useAccount, useConnect, useBalance } from "wagmi";
+import Image from "next/image";
+
+// Dirección del token Chanchis (CHNC) en Celo Mainnet
+const CHANCHIS_TOKEN_ADDRESS = "0xd85E17185cC11A02c7a8C5055FE7Cb6278Df9418" as const;
 
 export default function Home() {
   const { context, isMiniAppReady } = useMiniApp();
@@ -12,6 +16,12 @@ export default function Home() {
   // Wallet connection hooks
   const { address, isConnected, isConnecting } = useAccount();
   const { connect, connectors } = useConnect();
+
+  // Token balance hook for Chanchis (CHNC)
+  const { data: tokenBalance, isLoading: isBalanceLoading } = useBalance({
+    address: address,
+    token: CHANCHIS_TOKEN_ADDRESS,
+  });
   
   // Auto-connect wallet when miniapp is ready
   useEffect(() => {
@@ -54,6 +64,45 @@ export default function Home() {
     <main className="flex-1">
       <section className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="w-full max-w-md mx-auto p-8 text-center">
+          {/* Chanchis Token Balance Card */}
+          {isConnected && (
+            <div className="mb-8 bg-gradient-to-br from-yellow-400 via-orange-400 to-pink-500 rounded-2xl p-1 shadow-lg">
+              <div className="bg-white rounded-xl p-5">
+                <div className="flex items-center gap-4">
+                  {/* Token Image */}
+                  <div className="relative w-16 h-16 flex-shrink-0">
+                    <Image
+                      src="/ChainchisToken.png"
+                      alt="Chanchis Token"
+                      fill
+                      className="object-contain rounded-full"
+                    />
+                  </div>
+
+                  {/* Balance Info */}
+                  <div className="flex-1 text-left">
+                    <p className="text-sm text-gray-500 font-medium mb-1">Your Balance</p>
+                    {isBalanceLoading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-orange-500"></div>
+                        <span className="text-gray-400">Loading...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {tokenBalance?.formatted ? Number(tokenBalance.formatted).toLocaleString(undefined, { maximumFractionDigits: 2 }) : "0"}
+                        </p>
+                        <p className="text-sm text-orange-600 font-semibold">
+                          {tokenBalance?.symbol || "CHNC"}
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Welcome Header */}
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Welcome
