@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useSignTypedData } from "wagmi";
 import { parseUnits } from "viem";
 
@@ -12,7 +12,7 @@ interface SendModalProps {
   onTransferComplete: () => void;
 }
 
-type Step = "amount" | "scanner" | "confirming" | "success" | "error";
+type Step = "amount" | "recipient" | "confirming" | "success" | "error";
 
 // EIP-2612 Permit type data
 const PERMIT_TYPES = {
@@ -40,119 +40,162 @@ export function SendModal({
   const [recipientAddress, setRecipientAddress] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const scanningRef = useRef(false);
 
   const { signTypedDataAsync } = useSignTypedData();
 
-  // Cleanup camera on unmount or close
+  // Stop camera function
+  const stopCamera = useCallback(() => {
+    scanningRef.current = false;
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => {
+        track.stop();
+      });
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setCameraActive(false);
+  }, []);
+
+  // Cleanup camera on unmount
   useEffect(() => {
     return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-      }
+      stopCamera();
     };
-  }, []);
+  }, [stopCamera]);
 
   // Reset state when modal closes
   useEffect(() => {
     if (!isOpen) {
+      stopCamera();
       setStep("amount");
       setAmount("");
       setRecipientAddress("");
       setErrorMessage("");
+      setCameraError(null);
       setIsProcessing(false);
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
-      }
     }
-  }, [isOpen]);
+  }, [isOpen, stopCamera]);
 
-  const startScanner = async () => {
+  const startCamera = async () => {
+    setCameraError(null);
+
     try {
+      // Check if getUserMedia is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setCameraError("Camera not supported in this browser");
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
+        video: {
+          facingMode: { ideal: "environment" },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
       });
+
       streamRef.current = stream;
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+
+        // Wait for video to be ready
+        videoRef.current.onloadedmetadata = () => {
+          if (videoRef.current) {
+            videoRef.current.play()
+              .then(() => {
+                setCameraActive(true);
+                scanningRef.current = true;
+                scanForQRCode();
+              })
+              .catch((err) => {
+                console.error("Video play error:", err);
+                setCameraError("Could not start video stream");
+                stopCamera();
+              });
+          }
+        };
       }
-
-      setStep("scanner");
-
-      // Start scanning for QR codes
-      scanForQRCode();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Camera access error:", err);
-      setErrorMessage("Could not access camera. Please enter address manually.");
+      if (err.name === "NotAllowedError") {
+        setCameraError("Camera permission denied. Please allow camera access.");
+      } else if (err.name === "NotFoundError") {
+        setCameraError("No camera found on this device.");
+      } else {
+        setCameraError("Could not access camera. Please enter address manually.");
+      }
     }
   };
 
   const scanForQRCode = async () => {
-    if (!videoRef.current || !streamRef.current) return;
+    if (!videoRef.current || !streamRef.current || !scanningRef.current) return;
 
     // Check if BarcodeDetector is available
     if ("BarcodeDetector" in window) {
-      const barcodeDetector = new (window as any).BarcodeDetector({
-        formats: ["qr_code"],
-      });
+      try {
+        const barcodeDetector = new (window as any).BarcodeDetector({
+          formats: ["qr_code"],
+        });
 
-      const detectQR = async () => {
-        if (!videoRef.current || !streamRef.current) return;
+        const detectQR = async () => {
+          if (!videoRef.current || !streamRef.current || !scanningRef.current) return;
 
-        try {
-          const barcodes = await barcodeDetector.detect(videoRef.current);
-          if (barcodes.length > 0) {
-            const address = barcodes[0].rawValue;
-            if (address && address.startsWith("0x") && address.length === 42) {
-              handleAddressScanned(address);
-              return;
+          try {
+            const barcodes = await barcodeDetector.detect(videoRef.current);
+            if (barcodes.length > 0) {
+              const scannedValue = barcodes[0].rawValue;
+              // Check if it's a valid Ethereum address
+              if (scannedValue && scannedValue.match(/^0x[a-fA-F0-9]{40}$/)) {
+                handleAddressScanned(scannedValue);
+                return;
+              }
             }
+          } catch (err) {
+            // Silently continue scanning
           }
-        } catch (err) {
-          console.error("QR detection error:", err);
-        }
 
-        // Continue scanning
-        if (streamRef.current) {
-          requestAnimationFrame(detectQR);
-        }
-      };
+          // Continue scanning
+          if (scanningRef.current) {
+            requestAnimationFrame(detectQR);
+          }
+        };
 
-      detectQR();
-    } else {
-      // Fallback: Show manual input
-      setErrorMessage(
-        "QR scanner not supported in this browser. Please enter address manually."
-      );
+        detectQR();
+      } catch (err) {
+        console.error("BarcodeDetector error:", err);
+      }
     }
   };
 
   const handleAddressScanned = (address: string) => {
     setRecipientAddress(address);
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-    executeTransfer(address);
+    stopCamera();
   };
 
-  const handleManualAddress = () => {
-    if (recipientAddress && recipientAddress.startsWith("0x") && recipientAddress.length === 42) {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
-      }
-      executeTransfer(recipientAddress);
-    } else {
+  const proceedToRecipient = () => {
+    setStep("recipient");
+    // Try to start camera automatically
+    setTimeout(() => {
+      startCamera();
+    }, 100);
+  };
+
+  const executeTransfer = async () => {
+    if (!recipientAddress || !recipientAddress.match(/^0x[a-fA-F0-9]{40}$/)) {
       setErrorMessage("Please enter a valid Ethereum address");
+      return;
     }
-  };
 
-  const executeTransfer = async (toAddress: string) => {
+    stopCamera();
     setStep("confirming");
     setIsProcessing(true);
     setErrorMessage("");
@@ -205,7 +248,7 @@ export function SendModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           from: userAddress,
-          to: toAddress,
+          to: recipientAddress,
           amount: amountInWei.toString(),
           deadline: deadline.toString(),
           signature,
@@ -240,12 +283,12 @@ export function SendModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+      <div className="relative bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         {step !== "confirming" && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -312,80 +355,124 @@ export function SendModal({
             </div>
 
             <button
-              onClick={startScanner}
+              onClick={proceedToRecipient}
               disabled={!amount || parseFloat(amount) <= 0 || parseFloat(amount) > parseFloat(tokenBalance)}
-              className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 disabled:from-gray-300 disabled:to-gray-400 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 disabled:from-gray-300 disabled:to-gray-400 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              Scan QR Code
+              Continue
             </button>
           </>
         )}
 
-        {/* Scanner Step */}
-        {step === "scanner" && (
+        {/* Recipient Step */}
+        {step === "recipient" && (
           <>
             <div className="text-center mb-4">
-              <h2 className="text-xl font-bold text-gray-900">Scan Wallet QR</h2>
+              <h2 className="text-xl font-bold text-gray-900">Recipient</h2>
               <p className="text-sm text-gray-500 mt-1">
-                Point your camera at the recipient&apos;s QR code
+                Scan QR or enter wallet address
               </p>
             </div>
 
-            <div className="relative mb-4 rounded-xl overflow-hidden bg-black">
+            {/* Camera Section */}
+            <div className="relative mb-4 rounded-xl overflow-hidden bg-gray-900" style={{ minHeight: "200px" }}>
               <video
                 ref={videoRef}
-                className="w-full h-64 object-cover"
+                className="w-full h-48 object-cover"
                 playsInline
                 muted
+                autoPlay
               />
-              <div className="absolute inset-0 border-2 border-orange-500 rounded-xl pointer-events-none" />
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-48 h-48 border-2 border-white/50 rounded-lg" />
-              </div>
+
+              {!cameraActive && !cameraError && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mb-2"></div>
+                  <p className="text-white text-sm">Starting camera...</p>
+                </div>
+              )}
+
+              {cameraError && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 p-4">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-10 w-10 text-gray-500 mb-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <p className="text-gray-400 text-sm text-center">{cameraError}</p>
+                  <button
+                    onClick={startCamera}
+                    className="mt-2 text-orange-500 text-sm underline"
+                  >
+                    Try again
+                  </button>
+                </div>
+              )}
+
+              {cameraActive && (
+                <>
+                  <div className="absolute inset-0 border-2 border-orange-500 rounded-xl pointer-events-none" />
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-40 h-40 border-2 border-white/70 rounded-lg">
+                      <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-orange-500"></div>
+                      <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-orange-500"></div>
+                      <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-orange-500"></div>
+                      <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-orange-500"></div>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-2 left-0 right-0 text-center">
+                    <span className="bg-black/50 text-white text-xs px-2 py-1 rounded">
+                      Scanning for QR code...
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Manual Input */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Or enter address manually
+              </label>
+              <input
+                type="text"
+                value={recipientAddress}
+                onChange={(e) => setRecipientAddress(e.target.value)}
+                placeholder="0x..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm font-mono"
+              />
             </div>
 
             {errorMessage && (
-              <div className="mb-4">
-                <p className="text-sm text-red-500 mb-2">{errorMessage}</p>
-                <input
-                  type="text"
-                  value={recipientAddress}
-                  onChange={(e) => setRecipientAddress(e.target.value)}
-                  placeholder="0x..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm font-mono"
-                />
-                <button
-                  onClick={handleManualAddress}
-                  className="w-full mt-2 bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                >
-                  Send to Address
-                </button>
-              </div>
+              <p className="text-sm text-red-500 mb-4">{errorMessage}</p>
             )}
 
-            <p className="text-center text-sm text-gray-500">
-              Sending <span className="font-bold text-orange-600">{amount} CHNC</span>
-            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  stopCamera();
+                  setStep("amount");
+                }}
+                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors"
+              >
+                Back
+              </button>
+              <button
+                onClick={executeTransfer}
+                disabled={!recipientAddress}
+                className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 disabled:from-gray-300 disabled:to-gray-400 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200"
+              >
+                Send {amount} CHNC
+              </button>
+            </div>
           </>
         )}
 
