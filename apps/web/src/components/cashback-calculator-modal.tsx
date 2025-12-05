@@ -52,13 +52,13 @@ export function CashbackCalculatorModal({
       {/* Modal */}
       <div className="relative bg-white rounded-2xl w-full max-w-sm mx-4 shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-4">
+        <div className="px-6 py-4" style={{ backgroundColor: '#ffd166' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-white/30 rounded-full flex items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-white"
+                  className="h-5 w-5 text-gray-800"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -72,15 +72,15 @@ export function CashbackCalculatorModal({
                 </svg>
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">
+                <h2 className="text-lg font-bold text-gray-800">
                   Cashback Calculator
                 </h2>
-                <p className="text-white/80 text-sm">{business.business_name}</p>
+                <p className="text-gray-700 text-sm">{business.business_name}</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="text-white/80 hover:text-white transition-colors"
+              className="text-gray-700 hover:text-gray-900 transition-colors"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -103,9 +103,9 @@ export function CashbackCalculatorModal({
         {/* Content */}
         <div className="p-6 space-y-5">
           {/* Cashback Info */}
-          <div className="bg-green-50 rounded-xl p-4 flex items-center justify-between">
-            <span className="text-green-700 font-medium">Your Cashback Rate</span>
-            <span className="text-2xl font-bold text-green-600">
+          <div className="rounded-xl p-4 flex items-center justify-between" style={{ backgroundColor: 'rgba(255, 209, 102, 0.2)' }}>
+            <span className="text-gray-700 font-medium">Your Cashback Rate</span>
+            <span className="text-2xl font-bold" style={{ color: '#d4a017' }}>
               {business.cashback_percentage}%
             </span>
           </div>
@@ -126,7 +126,8 @@ export function CashbackCalculatorModal({
                 placeholder="0.00"
                 min="0"
                 step="0.01"
-                className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-lg"
+                className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:border-[#ffd166] text-lg"
+                style={{ outlineColor: '#ffd166' }}
                 autoFocus
               />
             </div>
@@ -152,10 +153,10 @@ export function CashbackCalculatorModal({
               </div>
 
               {/* CHNC to Give */}
-              <div className="bg-gradient-to-r from-orange-50 to-pink-50 rounded-xl p-4">
+              <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255, 209, 102, 0.15)' }}>
                 <div className="text-center">
                   <p className="text-sm text-gray-500 mb-1">CHNC to Give</p>
-                  <p className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
+                  <p className="text-3xl font-bold" style={{ color: '#d4a017' }}>
                     {chncAmount.toFixed(2)} CHNC
                   </p>
                 </div>

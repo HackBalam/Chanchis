@@ -71,13 +71,13 @@ export function ReceiveModal({ isOpen, onClose, address }: ReceiveModalProps) {
 
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'rgba(255, 107, 107, 0.15)' }}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-green-600"
+              className="h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor"
+              stroke="#ff6b6b"
             >
               <path
                 strokeLinecap="round"
@@ -109,7 +109,8 @@ export function ReceiveModal({ isOpen, onClose, address }: ReceiveModalProps) {
         {/* Copy Button */}
         <button
           onClick={copyToClipboard}
-          className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+          className="w-full text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 hover:opacity-90"
+          style={{ backgroundColor: '#ff6b6b' }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

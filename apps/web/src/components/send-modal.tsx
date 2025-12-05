@@ -316,13 +316,13 @@ export function SendModal({
         {step === "amount" && (
           <>
             <div className="text-center mb-6">
-              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'rgba(78, 205, 196, 0.15)' }}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-orange-600"
+                  className="h-6 w-6"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor"
+                  stroke="#4ecdc4"
                 >
                   <path
                     strokeLinecap="round"
@@ -348,7 +348,8 @@ export function SendModal({
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="0.00"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-lg"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-[#4ecdc4] text-lg"
+                  style={{ outlineColor: '#4ecdc4' }}
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
                   CHNC
@@ -362,7 +363,8 @@ export function SendModal({
             <button
               onClick={proceedToRecipient}
               disabled={!amount || parseFloat(amount) <= 0 || parseFloat(amount) > parseFloat(tokenBalance)}
-              className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 disabled:from-gray-300 disabled:to-gray-400 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200"
+              className="w-full text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: '#4ecdc4' }}
             >
               Continue
             </button>
@@ -391,7 +393,7 @@ export function SendModal({
 
               {!cameraActive && !cameraError && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mb-2"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 mb-2" style={{ borderColor: '#4ecdc4' }}></div>
                   <p className="text-white text-sm">Starting camera...</p>
                 </div>
               )}
@@ -415,7 +417,8 @@ export function SendModal({
                   <p className="text-gray-400 text-sm text-center">{cameraError}</p>
                   <button
                     onClick={startCamera}
-                    className="mt-2 text-orange-500 text-sm underline"
+                    className="mt-2 text-sm underline"
+                    style={{ color: '#4ecdc4' }}
                   >
                     Try again
                   </button>
@@ -424,13 +427,13 @@ export function SendModal({
 
               {cameraActive && (
                 <>
-                  <div className="absolute inset-0 border-2 border-orange-500 rounded-xl pointer-events-none" />
+                  <div className="absolute inset-0 border-2 rounded-xl pointer-events-none" style={{ borderColor: '#4ecdc4' }} />
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="w-40 h-40 border-2 border-white/70 rounded-lg">
-                      <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-orange-500"></div>
-                      <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-orange-500"></div>
-                      <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-orange-500"></div>
-                      <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-orange-500"></div>
+                      <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2" style={{ borderColor: '#4ecdc4' }}></div>
+                      <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2" style={{ borderColor: '#4ecdc4' }}></div>
+                      <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2" style={{ borderColor: '#4ecdc4' }}></div>
+                      <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2" style={{ borderColor: '#4ecdc4' }}></div>
                     </div>
                   </div>
                   <div className="absolute bottom-2 left-0 right-0 text-center">
@@ -452,7 +455,8 @@ export function SendModal({
                 value={recipientAddress}
                 onChange={(e) => setRecipientAddress(e.target.value)}
                 placeholder="0x..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm font-mono"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-[#4ecdc4] text-sm font-mono"
+                style={{ outlineColor: '#4ecdc4' }}
               />
             </div>
 
@@ -473,7 +477,8 @@ export function SendModal({
               <button
                 onClick={executeTransfer}
                 disabled={!recipientAddress}
-                className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 disabled:from-gray-300 disabled:to-gray-400 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200"
+                className="flex-1 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: '#4ecdc4' }}
               >
                 Send {amount} CHNC
               </button>
@@ -484,7 +489,7 @@ export function SendModal({
         {/* Confirming Step */}
         {step === "confirming" && (
           <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#4ecdc4' }}></div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Processing Transfer</h2>
             <p className="text-sm text-gray-500">
               Please sign the transaction in your wallet...
@@ -513,7 +518,7 @@ export function SendModal({
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Transfer Complete!</h2>
             <p className="text-sm text-gray-500 mb-6">
-              Successfully sent <span className="font-bold text-orange-600">{amount} CHNC</span>
+              Successfully sent <span className="font-bold" style={{ color: '#4ecdc4' }}>{amount} CHNC</span>
             </p>
             <button
               onClick={onClose}
