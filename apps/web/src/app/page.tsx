@@ -10,6 +10,7 @@ import { TransactionHistory } from "@/components/transaction-history";
 import { NavbarBottom } from "@/components/navbar-bottom";
 import { BusinessList } from "@/components/business-list";
 import { BusinessModal } from "@/components/business-modal";
+import { CashbackCalculatorModal } from "@/components/cashback-calculator-modal";
 import { Business } from "@/lib/supabase";
 
 // Dirección del token Chanchis (CHNC) en Celo Mainnet
@@ -21,6 +22,7 @@ export default function Home() {
   const [addMiniAppMessage, setAddMiniAppMessage] = useState<string | null>(null);
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
   const [isSendModalOpen, setIsSendModalOpen] = useState(false);
+  const [isCashbackModalOpen, setIsCashbackModalOpen] = useState(false);
   const [txRefreshTrigger, setTxRefreshTrigger] = useState(0);
 
   // View state for navbar
@@ -168,13 +170,13 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Action Buttons - Receive & Send */}
+              {/* Action Buttons - Receive, Send & Cashback */}
               {isConnected && (
-                <div className="mb-6 flex gap-4">
+                <div className="mb-6 flex gap-3">
                   {/* Receive Button */}
                   <button
                     onClick={() => setIsReceiveModalOpen(true)}
-                    className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex flex-col items-center gap-2"
+                    className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium py-4 px-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex flex-col items-center gap-2"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -190,13 +192,13 @@ export default function Home() {
                         d="M12 4v16m8-8H4"
                       />
                     </svg>
-                    <span>Receive</span>
+                    <span className="text-sm">Receive</span>
                   </button>
 
                   {/* Send Button */}
                   <button
                     onClick={() => setIsSendModalOpen(true)}
-                    className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-medium py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex flex-col items-center gap-2"
+                    className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-medium py-4 px-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex flex-col items-center gap-2"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -212,8 +214,32 @@ export default function Home() {
                         d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
                       />
                     </svg>
-                    <span>Send</span>
+                    <span className="text-sm">Send</span>
                   </button>
+
+                  {/* Cashback Calculator Button - Only for store owners */}
+                  {userBusiness && (
+                    <button
+                      onClick={() => setIsCashbackModalOpen(true)}
+                      className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-medium py-4 px-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex flex-col items-center gap-2"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <span className="text-sm">Cashback</span>
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -434,6 +460,14 @@ export default function Home() {
         existingBusiness={userBusiness}
         onSuccess={handleBusinessSuccess}
       />
+
+      {userBusiness && (
+        <CashbackCalculatorModal
+          isOpen={isCashbackModalOpen}
+          onClose={() => setIsCashbackModalOpen(false)}
+          business={userBusiness}
+        />
+      )}
     </main>
   );
 }
