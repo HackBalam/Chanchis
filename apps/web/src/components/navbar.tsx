@@ -11,6 +11,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { Business } from "@/lib/supabase"
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -29,6 +30,9 @@ interface NavbarProps {
   onAddMiniApp?: () => Promise<void>;
   isAddingMiniApp?: boolean;
   addMiniAppMessage?: string | null;
+  userBusiness?: Business | null;
+  isLoadingBusiness?: boolean;
+  onOpenBusinessModal?: () => void;
 }
 
 export function Navbar({
@@ -39,6 +43,9 @@ export function Navbar({
   onAddMiniApp,
   isAddingMiniApp,
   addMiniAppMessage,
+  userBusiness,
+  isLoadingBusiness,
+  onOpenBusinessModal,
 }: NavbarProps) {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
@@ -141,6 +148,64 @@ export function Navbar({
 
               {/* Divider */}
               <div className="border-t border-gray-200 my-4"></div>
+
+              {/* Create/Edit Store Button */}
+              {isConnected && onOpenBusinessModal && (
+                <div className="mb-4">
+                  <Button
+                    onClick={() => {
+                      onOpenBusinessModal();
+                      setIsOpen(false);
+                    }}
+                    disabled={isLoadingBusiness}
+                    className="w-full justify-center gap-2 py-5 text-white hover:opacity-90"
+                    style={{ backgroundColor: '#4ecdc4' }}
+                  >
+                    {isLoadingBusiness ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Loading...
+                      </>
+                    ) : userBusiness ? (
+                      <>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                        Edit My Store
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 4v16m8-8H4"
+                          />
+                        </svg>
+                        Create Store
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
 
               {/* Add Miniapp Button */}
               {onAddMiniApp && (
