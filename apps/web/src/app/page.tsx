@@ -1,7 +1,7 @@
 "use client";
 import { useMiniApp } from "@/contexts/miniapp-context";
 import { useState, useEffect, useCallback } from "react";
-import { useAccount, useConnect, useBalance } from "wagmi";
+import { useAccount, useConnect, useBalance, useWatchBlockNumber } from "wagmi";
 import Image from "next/image";
 import { ReceiveModal } from "@/components/receive-modal";
 import { SendModal } from "@/components/send-modal";
@@ -39,6 +39,13 @@ export default function Home() {
   const { data: tokenBalance, isLoading: isBalanceLoading, refetch: refetchBalance } = useBalance({
     address: address,
     token: CHANCHIS_TOKEN_ADDRESS,
+  });
+
+  // Watch for new blocks and refresh balance automatically
+  useWatchBlockNumber({
+    onBlockNumber: () => {
+      refetchBalance();
+    },
   });
 
   // Fetch user's business
