@@ -193,43 +193,17 @@ export function TransactionHistory({ address, refreshTrigger }: TransactionHisto
               >
                 {/* Icon */}
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    tx.type === "in"
-                      ? "bg-green-100"
-                      : "bg-orange-100"
-                  }`}
+                  className="w-10 h-10 rounded-full flex items-center justify-center border-2 bg-white"
+                  style={{
+                    borderColor: tx.type === "in" ? '#4ecdc4' : '#ff6b6b'
+                  }}
                 >
-                  {tx.type === "in" ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-green-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                      />
-                    </svg>
-                  ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-orange-600"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 10l7-7m0 0l7 7m-7-7v18"
-                      />
-                    </svg>
-                  )}
+                  <span
+                    className="text-lg font-bold"
+                    style={{ color: tx.type === "in" ? '#4ecdc4' : '#ff6b6b' }}
+                  >
+                    {tx.type === "in" ? "+" : "-"}
+                  </span>
                 </div>
 
                 {/* Details */}
