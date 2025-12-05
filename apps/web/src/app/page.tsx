@@ -145,7 +145,7 @@ export default function Home() {
                         />
                       </svg>
                       <span className="text-xs text-gray-400 font-semibold tracking-wider uppercase">
-                        Saldo Total
+                        Total Balance
                       </span>
                     </div>
 
