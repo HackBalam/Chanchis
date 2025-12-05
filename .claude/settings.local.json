@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "WebFetch(domain:docs.celo.org)",
-      "WebFetch(domain:celoscan.io)"
+      "WebFetch(domain:celoscan.io)",
+      "Bash(copy:*)"
     ],
     "deny": [],
     "ask": []

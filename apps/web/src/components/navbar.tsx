@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Menu } from "lucide-react"
 import { useState } from "react"
 
@@ -63,7 +64,14 @@ export function Navbar({
             <SheetContent side="left" className="w-80 overflow-y-auto">
               {/* Header */}
               <div className="flex items-center gap-2 mb-6">
-                <span className="font-bold text-lg bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
+                <Image
+                  src="/cerditoCara.png"
+                  alt="Chanchis"
+                  width={32}
+                  height={32}
+                  className="object-contain"
+                />
+                <span className="font-bold text-lg" style={{ color: '#ec4899' }}>
                   Chanchis
                 </span>
               </div>
@@ -251,8 +259,15 @@ export function Navbar({
           </Sheet>
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <span className="font-bold text-xl bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <Image
+              src="/cerditoCara.png"
+              alt="Chanchis"
+              width={36}
+              height={36}
+              className="object-contain"
+            />
+            <span className="font-bold text-xl" style={{ color: '#ec4899' }}>
               Chanchis
             </span>
           </Link>

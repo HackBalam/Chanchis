@@ -46,7 +46,7 @@ export function BusinessCard({ business, isOwner, onEdit }: BusinessCardProps) {
         )}
 
         {/* Cashback Badge */}
-        <div className="absolute top-3 right-3 bg-green-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
+        <div className="absolute top-3 right-3 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg" style={{ backgroundColor: '#ec4899' }}>
           {business.cashback_percentage}% Cashback
         </div>
 
@@ -91,7 +91,7 @@ export function BusinessCard({ business, isOwner, onEdit }: BusinessCardProps) {
           <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-3">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 text-orange-500"
+              className="h-4 w-4 text-pink-500"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

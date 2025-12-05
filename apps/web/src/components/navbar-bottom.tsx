@@ -14,7 +14,7 @@ export function NavbarBottom({ activeView, onViewChange }: NavbarBottomProps) {
           onClick={() => onViewChange("home")}
           className={`flex-1 flex flex-col items-center justify-center py-3 transition-colors ${
             activeView === "home"
-              ? "text-orange-600"
+              ? "text-pink-500"
               : "text-gray-400 hover:text-gray-600"
           }`}
         >
@@ -34,7 +34,7 @@ export function NavbarBottom({ activeView, onViewChange }: NavbarBottomProps) {
           </svg>
           <span className="text-xs font-medium">Home</span>
           {activeView === "home" && (
-            <div className="absolute bottom-0 w-12 h-0.5 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full" />
+            <div className="absolute bottom-0 w-12 h-0.5 bg-pink-500 rounded-full" />
           )}
         </button>
 
@@ -43,7 +43,7 @@ export function NavbarBottom({ activeView, onViewChange }: NavbarBottomProps) {
           onClick={() => onViewChange("stores")}
           className={`flex-1 flex flex-col items-center justify-center py-3 transition-colors relative ${
             activeView === "stores"
-              ? "text-orange-600"
+              ? "text-pink-500"
               : "text-gray-400 hover:text-gray-600"
           }`}
         >
@@ -63,7 +63,7 @@ export function NavbarBottom({ activeView, onViewChange }: NavbarBottomProps) {
           </svg>
           <span className="text-xs font-medium">Stores</span>
           {activeView === "stores" && (
-            <div className="absolute bottom-0 w-12 h-0.5 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full" />
+            <div className="absolute bottom-0 w-12 h-0.5 bg-pink-500 rounded-full" />
           )}
         </button>
       </div>
