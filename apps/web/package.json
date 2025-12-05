@@ -30,7 +30,8 @@
     "viem": "^2.27.2",
     "wagmi": "^2.14.12",
     "zod": "^3.24.1",
-    "qrcode": "^1.5.3"
+    "qrcode": "^1.5.3",
+    "@supabase/supabase-js": "^2.47.0"
   },
   "devDependencies": {
     "@types/qrcode": "^1.5.5",
