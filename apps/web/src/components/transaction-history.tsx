@@ -220,9 +220,8 @@ export function TransactionHistory({ address, refreshTrigger }: TransactionHisto
                 {/* Amount & Time */}
                 <div className="text-right">
                   <p
-                    className={`text-sm font-semibold ${
-                      tx.type === "in" ? "text-green-600" : "text-orange-600"
-                    }`}
+                    className="text-sm font-semibold"
+                    style={{ color: tx.type === "in" ? '#4ecdc4' : '#ff6b6b' }}
                   >
                     {tx.type === "in" ? "+" : "-"}
                     {formatAmount(tx.value, tx.tokenDecimal)} {tx.tokenSymbol}
