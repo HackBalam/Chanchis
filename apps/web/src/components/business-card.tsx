@@ -91,10 +91,11 @@ export function BusinessCard({ business, isOwner, onEdit }: BusinessCardProps) {
           <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-3">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 text-pink-500"
+              className="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              style={{ color: '#ff6b6b' }}
             >
               <path
                 strokeLinecap="round"

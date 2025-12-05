@@ -186,7 +186,8 @@ export function Navbar({
 
               {/* Connect Wallet Button */}
               <Button
-                className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white py-5 mb-4"
+                className="w-full text-white py-5 mb-4 hover:opacity-90"
+                style={{ backgroundColor: '#ff6b6b' }}
                 disabled={isConnected}
               >
                 {isConnected ? (

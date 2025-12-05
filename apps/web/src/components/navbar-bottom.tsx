@@ -12,11 +12,8 @@ export function NavbarBottom({ activeView, onViewChange }: NavbarBottomProps) {
         {/* Home Tab */}
         <button
           onClick={() => onViewChange("home")}
-          className={`flex-1 flex flex-col items-center justify-center py-3 transition-colors ${
-            activeView === "home"
-              ? "text-pink-500"
-              : "text-gray-400 hover:text-gray-600"
-          }`}
+          className="flex-1 flex flex-col items-center justify-center py-3 transition-colors"
+          style={{ color: activeView === "home" ? '#ff6b6b' : '#9ca3af' }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -34,18 +31,15 @@ export function NavbarBottom({ activeView, onViewChange }: NavbarBottomProps) {
           </svg>
           <span className="text-xs font-medium">Home</span>
           {activeView === "home" && (
-            <div className="absolute bottom-0 w-12 h-0.5 bg-pink-500 rounded-full" />
+            <div className="absolute bottom-0 w-12 h-0.5 rounded-full" style={{ backgroundColor: '#ff6b6b' }} />
           )}
         </button>
 
         {/* Stores Tab */}
         <button
           onClick={() => onViewChange("stores")}
-          className={`flex-1 flex flex-col items-center justify-center py-3 transition-colors relative ${
-            activeView === "stores"
-              ? "text-pink-500"
-              : "text-gray-400 hover:text-gray-600"
-          }`}
+          className="flex-1 flex flex-col items-center justify-center py-3 transition-colors relative"
+          style={{ color: activeView === "stores" ? '#ff6b6b' : '#9ca3af' }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -63,7 +57,7 @@ export function NavbarBottom({ activeView, onViewChange }: NavbarBottomProps) {
           </svg>
           <span className="text-xs font-medium">Stores</span>
           {activeView === "stores" && (
-            <div className="absolute bottom-0 w-12 h-0.5 bg-pink-500 rounded-full" />
+            <div className="absolute bottom-0 w-12 h-0.5 rounded-full" style={{ backgroundColor: '#ff6b6b' }} />
           )}
         </button>
       </div>
