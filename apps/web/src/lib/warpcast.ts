@@ -44,7 +44,7 @@ export async function getFarcasterManifest() {
     miniapp: {
       version: "1",
       name: frameName,
-      iconUrl: `${appUrl}/icon.png`,
+      iconUrl: `${appUrl}/cerditoCara.png`,
       homeUrl: appUrl,
       imageUrl: `${appUrl}/opengraph-image.png`,
       buttonTitle: `Launch App`,
