@@ -52,7 +52,7 @@ export async function getFarcasterManifest() {
       splashBackgroundColor: "#FFFFFF",
       webhookUrl: `${appUrl}/api/webhook`,
       // Metadata https://github.com/farcasterxyz/miniapps/discussions/191
-      subtitle: "System for all local businesses", // 30 characters, no emojis or special characters, short description under app name
+      subtitle: "One points system for all", // 30 characters, no emojis or special characters, short description under app name
       description: "Chanchis is a unified reward wallet that lets people save money through their everyday purchases", // 170 characters, no emojis or special characters, promotional message displayed on Mini App Page
       primaryCategory: "social",
       tags: ["mini-app", "celo"], // up to 5 tags, filtering/search tags
