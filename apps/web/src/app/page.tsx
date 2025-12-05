@@ -70,14 +70,13 @@ export default function Home() {
     }
   }, [isConnected, address, fetchUserBusiness, businessRefreshTrigger]);
 
-  // Callback to refresh balance and transactions after transfer
+  // Callback to refresh transactions after transfer (balance is updated by useWatchBlockNumber)
   const handleTransferComplete = useCallback(() => {
-    refetchBalance();
     // Trigger transaction history refresh after a short delay to allow indexing
     setTimeout(() => {
       setTxRefreshTrigger((prev) => prev + 1);
     }, 3000);
-  }, [refetchBalance]);
+  }, []);
 
   // Callback when business is created/updated
   const handleBusinessSuccess = useCallback(() => {
