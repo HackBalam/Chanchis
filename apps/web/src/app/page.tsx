@@ -126,37 +126,58 @@ export default function Home() {
             <>
               {/* Chanchis Token Balance Card */}
               {isConnected && (
-                <div className="mb-6 bg-gradient-to-br from-yellow-400 via-orange-400 to-pink-500 rounded-2xl p-1 shadow-lg">
-                  <div className="bg-white rounded-xl p-5">
-                    <div className="flex items-center gap-4">
+                <div className="mb-6 bg-white rounded-2xl shadow-lg overflow-hidden border-l-4 border-pink-500">
+                  <div className="p-5">
+                    {/* Header */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                        />
+                      </svg>
+                      <span className="text-xs text-gray-400 font-semibold tracking-wider uppercase">
+                        Saldo Total
+                      </span>
+                    </div>
+
+                    {/* Balance and Token Image */}
+                    <div className="flex items-center justify-between">
+                      {/* Balance */}
+                      <div>
+                        {isBalanceLoading ? (
+                          <div className="flex items-center gap-2">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-pink-500"></div>
+                            <span className="text-gray-400">Loading...</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-4xl font-bold text-gray-800">
+                              {tokenBalance?.formatted ? Number(tokenBalance.formatted).toLocaleString(undefined, { maximumFractionDigits: 2 }) : "0"}
+                            </span>
+                            <span className="text-lg font-semibold text-gray-400">
+                              {tokenBalance?.symbol || "CHNC"}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
                       {/* Token Image */}
-                      <div className="relative w-16 h-16 flex-shrink-0">
+                      <div className="relative w-14 h-14 flex-shrink-0">
                         <Image
                           src="/ChainchisToken.png"
                           alt="Chanchis Token"
                           fill
                           className="object-contain rounded-full"
                         />
-                      </div>
-
-                      {/* Balance Info */}
-                      <div className="flex-1 text-left">
-                        <p className="text-sm text-gray-500 font-medium mb-1">Your Balance</p>
-                        {isBalanceLoading ? (
-                          <div className="flex items-center gap-2">
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-orange-500"></div>
-                            <span className="text-gray-400">Loading...</span>
-                          </div>
-                        ) : (
-                          <>
-                            <p className="text-2xl font-bold text-gray-900">
-                              {tokenBalance?.formatted ? Number(tokenBalance.formatted).toLocaleString(undefined, { maximumFractionDigits: 2 }) : "0"}
-                            </p>
-                            <p className="text-sm text-orange-600 font-semibold">
-                              {tokenBalance?.symbol || "CHNC"}
-                            </p>
-                          </>
-                        )}
                       </div>
                     </div>
                   </div>
