@@ -1,7 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createPublicClient, createWalletClient, http, parseSignature } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { celo } from "viem/chains";
 
-const CHANCHIS_TOKEN_ADDRESS = "0xd85E17185cC11A02c7a8C5055FE7Cb6278Df9418";
-const CELO_CHAIN_ID = 42220;
+const CHANCHIS_TOKEN_ADDRESS = "0xd85E17185cC11A02c7a8C5055FE7Cb6278Df9418" as const;
+
+// ERC20 Permit + TransferFrom ABI
+const TOKEN_ABI = [
+  {
+    inputs: [
+      { name: "owner", type: "address" },
+      { name: "spender", type: "address" },
+      { name: "value", type: "uint256" },
+      { name: "deadline", type: "uint256" },
+      { name: "v", type: "uint8" },
+      { name: "r", type: "bytes32" },
+      { name: "s", type: "bytes32" },
+    ],
+    name: "permit",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { name: "from", type: "address" },
+      { name: "to", type: "address" },
+      { name: "amount", type: "uint256" },
+    ],
+    name: "transferFrom",
+    outputs: [{ name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+] as const;
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,88 +47,102 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const thirdwebSecretKey = process.env.THIRDWEB_SECRET_KEY;
-    const sponsorAddress = process.env.SPONSOR_WALLET_ADDRESS;
+    const sponsorPrivateKey = process.env.SPONSOR_WALLET_PRIVATE_KEY;
 
-    if (!thirdwebSecretKey || !sponsorAddress) {
+    if (!sponsorPrivateKey) {
       return NextResponse.json(
-        { error: "Server not configured properly" },
+        { error: "Sponsor wallet not configured" },
         { status: 500 }
       );
     }
+
+    // Create wallet client from sponsor private key
+    const account = privateKeyToAccount(`0x${sponsorPrivateKey.replace("0x", "")}`);
+
+    const walletClient = createWalletClient({
+      account,
+      chain: celo,
+      transport: http(),
+    });
+
+    const publicClient = createPublicClient({
+      chain: celo,
+      transport: http(),
+    });
 
     // Parse the signature to extract v, r, s
-    const sig = signature.slice(2); // Remove '0x'
-    const r = "0x" + sig.slice(0, 64);
-    const s = "0x" + sig.slice(64, 128);
-    const v = parseInt(sig.slice(128, 130), 16);
+    const { v, r, s } = parseSignature(signature as `0x${string}`);
+
+    console.log("Executing permit...");
+    console.log("From:", from);
+    console.log("Spender:", account.address);
+    console.log("Amount:", amount);
+    console.log("Deadline:", deadline);
 
     // Step 1: Execute permit to allow sponsor to spend tokens
-    const permitResponse = await fetch("https://api.thirdweb.com/v1/contracts/write", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-secret-key": thirdwebSecretKey,
-      },
-      body: JSON.stringify({
-        calls: [
-          {
-            contractAddress: CHANCHIS_TOKEN_ADDRESS,
-            method:
-              "function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)",
-            params: [from, sponsorAddress, amount, deadline, v, r, s],
-          },
-        ],
-        chainId: CELO_CHAIN_ID,
-        from: sponsorAddress,
-      }),
+    const permitHash = await walletClient.writeContract({
+      address: CHANCHIS_TOKEN_ADDRESS,
+      abi: TOKEN_ABI,
+      functionName: "permit",
+      args: [
+        from as `0x${string}`,
+        account.address,
+        BigInt(amount),
+        BigInt(deadline),
+        Number(v),
+        r,
+        s,
+      ],
     });
 
-    const permitData = await permitResponse.json();
+    console.log("Permit tx hash:", permitHash);
 
-    if (!permitResponse.ok) {
-      console.error("Permit error:", permitData);
+    // Wait for permit transaction to be confirmed
+    const permitReceipt = await publicClient.waitForTransactionReceipt({
+      hash: permitHash,
+    });
+
+    if (permitReceipt.status !== "success") {
       return NextResponse.json(
-        { error: permitData.error || "Permit failed" },
+        { error: "Permit transaction failed" },
         { status: 500 }
       );
     }
+
+    console.log("Permit confirmed, executing transferFrom...");
 
     // Step 2: Execute transferFrom
-    const transferResponse = await fetch("https://api.thirdweb.com/v1/contracts/write", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-secret-key": thirdwebSecretKey,
-      },
-      body: JSON.stringify({
-        calls: [
-          {
-            contractAddress: CHANCHIS_TOKEN_ADDRESS,
-            method:
-              "function transferFrom(address from, address to, uint256 amount) returns (bool)",
-            params: [from, to, amount],
-          },
-        ],
-        chainId: CELO_CHAIN_ID,
-        from: sponsorAddress,
-      }),
+    const transferHash = await walletClient.writeContract({
+      address: CHANCHIS_TOKEN_ADDRESS,
+      abi: TOKEN_ABI,
+      functionName: "transferFrom",
+      args: [
+        from as `0x${string}`,
+        to as `0x${string}`,
+        BigInt(amount),
+      ],
     });
 
-    const transferData = await transferResponse.json();
+    console.log("Transfer tx hash:", transferHash);
 
-    if (!transferResponse.ok) {
-      console.error("Transfer error:", transferData);
+    // Wait for transfer transaction to be confirmed
+    const transferReceipt = await publicClient.waitForTransactionReceipt({
+      hash: transferHash,
+    });
+
+    if (transferReceipt.status !== "success") {
       return NextResponse.json(
-        { error: transferData.error || "Transfer failed" },
+        { error: "Transfer transaction failed" },
         { status: 500 }
       );
     }
+
+    console.log("Transfer confirmed!");
 
     return NextResponse.json({
       success: true,
-      permitTxHash: permitData.transactionHash,
-      transferTxHash: transferData.transactionHash,
+      permitTxHash: permitHash,
+      transferTxHash: transferHash,
     });
   } catch (error: any) {
     console.error("Transfer API error:", error);

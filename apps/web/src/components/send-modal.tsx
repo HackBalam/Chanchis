@@ -216,12 +216,17 @@ export function SendModal({
         throw new Error("Failed to get nonce");
       }
 
-      const { nonce, spender } = await nonceResponse.json();
+      const { nonce, spender, tokenName, version } = await nonceResponse.json();
 
-      // Create permit signature
+      console.log("Token name from API:", tokenName);
+      console.log("Version from API:", version);
+      console.log("Nonce:", nonce);
+      console.log("Spender:", spender);
+
+      // Create permit signature with correct domain from contract
       const domain = {
-        name: "Chanchis",
-        version: "1",
+        name: tokenName || "Chanchis",
+        version: version || "1",
         chainId: CELO_CHAIN_ID,
         verifyingContract: CHANCHIS_TOKEN_ADDRESS as `0x${string}`,
       };
