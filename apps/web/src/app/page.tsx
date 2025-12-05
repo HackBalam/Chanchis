@@ -6,6 +6,7 @@ import { useAccount, useConnect, useBalance } from "wagmi";
 import Image from "next/image";
 import { ReceiveModal } from "@/components/receive-modal";
 import { SendModal } from "@/components/send-modal";
+import { TransactionHistory } from "@/components/transaction-history";
 
 // Dirección del token Chanchis (CHNC) en Celo Mainnet
 const CHANCHIS_TOKEN_ADDRESS = "0xd85E17185cC11A02c7a8C5055FE7Cb6278Df9418" as const;
@@ -16,6 +17,7 @@ export default function Home() {
   const [addMiniAppMessage, setAddMiniAppMessage] = useState<string | null>(null);
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
   const [isSendModalOpen, setIsSendModalOpen] = useState(false);
+  const [txRefreshTrigger, setTxRefreshTrigger] = useState(0);
 
   // Wallet connection hooks
   const { address, isConnected, isConnecting } = useAccount();
@@ -27,9 +29,13 @@ export default function Home() {
     token: CHANCHIS_TOKEN_ADDRESS,
   });
 
-  // Callback to refresh balance after transfer
+  // Callback to refresh balance and transactions after transfer
   const handleTransferComplete = useCallback(() => {
     refetchBalance();
+    // Trigger transaction history refresh after a short delay to allow indexing
+    setTimeout(() => {
+      setTxRefreshTrigger((prev) => prev + 1);
+    }, 3000);
   }, [refetchBalance]);
   
   // Auto-connect wallet when miniapp is ready
@@ -158,6 +164,16 @@ export default function Home() {
                 </svg>
                 <span>Send</span>
               </button>
+            </div>
+          )}
+
+          {/* Transaction History */}
+          {isConnected && address && (
+            <div className="mb-8">
+              <TransactionHistory
+                address={address}
+                refreshTrigger={txRefreshTrigger}
+              />
             </div>
           )}
 

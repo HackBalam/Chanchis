@@ -8,6 +8,7 @@ export const env = createEnv({
     THIRDWEB_SECRET_KEY: z.string().min(1).optional().default("build-time-placeholder"),
     SPONSOR_WALLET_ADDRESS: z.string().min(1).optional().default("build-time-placeholder"),
     SPONSOR_WALLET_PRIVATE_KEY: z.string().min(1).optional().default("build-time-placeholder"),
+    ETHERSCAN_API_KEY: z.string().min(1).optional().default("build-time-placeholder"),
   },
   client: {
     NEXT_PUBLIC_URL: z.string().min(1).optional().default("http://localhost:3000"),
