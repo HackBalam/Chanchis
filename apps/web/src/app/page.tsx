@@ -1,6 +1,5 @@
 "use client";
 import { useMiniApp } from "@/contexts/miniapp-context";
-import { sdk } from "@farcaster/frame-sdk";
 import { useState, useEffect, useCallback } from "react";
 import { useAccount, useConnect, useBalance } from "wagmi";
 import Image from "next/image";
@@ -18,8 +17,6 @@ const CHANCHIS_TOKEN_ADDRESS = "0xd85E17185cC11A02c7a8C5055FE7Cb6278Df9418" as c
 
 export default function Home() {
   const { context, isMiniAppReady } = useMiniApp();
-  const [isAddingMiniApp, setIsAddingMiniApp] = useState(false);
-  const [addMiniAppMessage, setAddMiniAppMessage] = useState<string | null>(null);
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
   const [isSendModalOpen, setIsSendModalOpen] = useState(false);
   const [isCashbackModalOpen, setIsCashbackModalOpen] = useState(false);
@@ -99,17 +96,7 @@ export default function Home() {
 
   // Extract user data from context
   const user = context?.user;
-  // Use connected wallet address if available, otherwise fall back to user custody/verification
-  const walletAddress = address || user?.custody || user?.verifications?.[0] || "0x1e4B...605B";
   const displayName = user?.displayName || user?.username || "User";
-  const username = user?.username || "@user";
-  const pfpUrl = user?.pfpUrl;
-
-  // Format wallet address to show first 6 and last 4 characters
-  const formatAddress = (addr: string) => {
-    if (!addr || addr.length < 10) return addr;
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-  };
 
   if (!isMiniAppReady) {
     return (
@@ -311,115 +298,6 @@ export default function Home() {
                 </div>
               )}
 
-              {/* User Profile Section */}
-              <div className="mb-6 bg-white rounded-2xl shadow-md p-6">
-                {/* Profile Avatar */}
-                <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center overflow-hidden">
-                  {pfpUrl ? (
-                    <img
-                      src={pfpUrl}
-                      alt="Profile"
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center">
-                      <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Profile Info */}
-                <div className="text-center mb-4">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-1">
-                    {displayName}
-                  </h2>
-                  <p className="text-gray-500">
-                    {username.startsWith('@') ? username : `@${username}`}
-                  </p>
-                </div>
-
-                {/* Wallet Status */}
-                <div className="bg-gray-50 rounded-xl px-4 py-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-gray-500 font-medium">Wallet</span>
-                    <div className={`flex items-center gap-1 text-xs ${
-                      isConnected ? 'text-green-600' : isConnecting ? 'text-yellow-600' : 'text-gray-500'
-                    }`}>
-                      <div className={`w-2 h-2 rounded-full ${
-                        isConnected ? 'bg-green-500' : isConnecting ? 'bg-yellow-500' : 'bg-gray-400'
-                      }`}></div>
-                      {isConnected ? 'Connected' : isConnecting ? 'Connecting...' : 'Disconnected'}
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-700 font-mono">
-                    {formatAddress(walletAddress)}
-                  </p>
-                </div>
-              </div>
-
-              {/* Add Miniapp Button */}
-              <div className="mb-6">
-                <button
-                  onClick={async () => {
-                    if (isAddingMiniApp) return;
-
-                    setIsAddingMiniApp(true);
-                    setAddMiniAppMessage(null);
-
-                    try {
-                      const result = await sdk.actions.addMiniApp();
-                      if (result) {
-                        setAddMiniAppMessage("Miniapp added successfully!");
-                      } else {
-                        setAddMiniAppMessage("Miniapp was not added (user declined or already exists)");
-                      }
-                    } catch (error: any) {
-                      console.error('Add miniapp error:', error);
-                      if (error?.message?.includes('domain')) {
-                        setAddMiniAppMessage("This miniapp can only be added from its official domain");
-                      } else {
-                        setAddMiniAppMessage("Failed to add miniapp. Please try again.");
-                      }
-                    } finally {
-                      setIsAddingMiniApp(false);
-                    }
-                  }}
-                  disabled={isAddingMiniApp}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2"
-                >
-                  {isAddingMiniApp ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Adding...
-                    </>
-                  ) : (
-                    <>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-                        />
-                      </svg>
-                      Add Miniapp
-                    </>
-                  )}
-                </button>
-
-                {/* Add Miniapp Status Message */}
-                {addMiniAppMessage && (
-                  <div className="mt-3 p-3 bg-white rounded-xl shadow-sm">
-                    <p className="text-sm text-gray-700">{addMiniAppMessage}</p>
-                  </div>
-                )}
-              </div>
             </>
           )}
 
