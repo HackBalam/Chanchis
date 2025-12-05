@@ -88,6 +88,7 @@ export async function POST(request: NextRequest) {
         owner_name: body.owner_name,
         business_name: body.business_name,
         description: body.description,
+        location: body.location || null,
         cashback_percentage: body.cashback_percentage,
         cover_image_url: body.cover_image_url || null,
       })

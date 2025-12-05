@@ -25,6 +25,7 @@ export interface Business {
   owner_name: string;
   business_name: string;
   description: string;
+  location: string | null;
   cashback_percentage: number;
   cover_image_url: string | null;
   created_at: string;
@@ -36,6 +37,7 @@ export interface CreateBusinessInput {
   owner_name: string;
   business_name: string;
   description: string;
+  location?: string | null;
   cashback_percentage: number;
   cover_image_url?: string | null;
 }
@@ -43,6 +45,7 @@ export interface CreateBusinessInput {
 export interface UpdateBusinessInput {
   business_name?: string;
   description?: string;
+  location?: string | null;
   cashback_percentage?: number;
   cover_image_url?: string | null;
 }

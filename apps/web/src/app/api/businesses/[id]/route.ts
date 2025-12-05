@@ -70,6 +70,7 @@ export async function PUT(
 
     if (body.business_name) updateData.business_name = body.business_name;
     if (body.description) updateData.description = body.description;
+    if (body.location !== undefined) updateData.location = body.location;
     if (body.cashback_percentage !== undefined)
       updateData.cashback_percentage = body.cashback_percentage;
     if (body.cover_image_url !== undefined)

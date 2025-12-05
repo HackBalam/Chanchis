@@ -23,6 +23,7 @@ export function BusinessModal({
 }: BusinessModalProps) {
   const [businessName, setBusinessName] = useState("");
   const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
   const [cashbackPercentage, setCashbackPercentage] = useState("");
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
@@ -38,11 +39,13 @@ export function BusinessModal({
     if (existingBusiness) {
       setBusinessName(existingBusiness.business_name);
       setDescription(existingBusiness.description);
+      setLocation(existingBusiness.location || "");
       setCashbackPercentage(existingBusiness.cashback_percentage.toString());
       setCoverImagePreview(existingBusiness.cover_image_url);
     } else {
       setBusinessName("");
       setDescription("");
+      setLocation("");
       setCashbackPercentage("");
       setCoverImage(null);
       setCoverImagePreview(null);
@@ -113,6 +116,7 @@ export function BusinessModal({
             wallet_address: userWallet,
             business_name: businessName.trim(),
             description: description.trim(),
+            location: location.trim() || null,
             cashback_percentage: cashback,
             cover_image_url: imageUrl,
           }),
@@ -133,6 +137,7 @@ export function BusinessModal({
             owner_name: userName,
             business_name: businessName.trim(),
             description: description.trim(),
+            location: location.trim() || null,
             cashback_percentage: cashback,
             cover_image_url: imageUrl,
           }),
@@ -291,6 +296,42 @@ export function BusinessModal({
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
               required
             />
+          </div>
+
+          {/* Location */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Location
+            </label>
+            <div className="relative">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="City, Country or Address"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              />
+            </div>
           </div>
 
           {/* Cashback Percentage */}
