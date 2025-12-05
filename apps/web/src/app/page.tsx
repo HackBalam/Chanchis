@@ -41,10 +41,11 @@ export default function Home() {
     token: CHANCHIS_TOKEN_ADDRESS,
   });
 
-  // Watch for new blocks and refresh balance automatically
+  // Watch for new blocks and refresh balance + transactions automatically
   useWatchBlockNumber({
     onBlockNumber: () => {
       refetchBalance();
+      setTxRefreshTrigger((prev) => prev + 1);
     },
   });
 
@@ -70,12 +71,9 @@ export default function Home() {
     }
   }, [isConnected, address, fetchUserBusiness, businessRefreshTrigger]);
 
-  // Callback to refresh transactions after transfer (balance is updated by useWatchBlockNumber)
+  // Callback after transfer completes (balance and transactions are updated by useWatchBlockNumber)
   const handleTransferComplete = useCallback(() => {
-    // Trigger transaction history refresh after a short delay to allow indexing
-    setTimeout(() => {
-      setTxRefreshTrigger((prev) => prev + 1);
-    }, 3000);
+    // useWatchBlockNumber handles the refresh automatically
   }, []);
 
   // Callback when business is created/updated
