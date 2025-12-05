@@ -187,16 +187,16 @@ export default function Home() {
               {/* Action Buttons - Receive, Send & Cashback */}
               {isConnected && (
                 <div className="mb-6 bg-white rounded-2xl shadow-lg p-4">
-                  <div className="flex gap-3">
+                  <div className={`grid gap-3 ${userBusiness ? 'grid-cols-3' : 'grid-cols-2'}`}>
                     {/* Receive Button */}
                     <button
                       onClick={() => setIsReceiveModalOpen(true)}
-                      className="flex-1 text-white font-medium py-3 px-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg hover:opacity-90 flex items-center justify-center gap-2"
+                      className="text-white font-medium py-3 px-2 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg hover:opacity-90 flex items-center justify-center gap-1.5"
                       style={{ backgroundColor: '#ff6b6b' }}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
+                        className="h-4 w-4 flex-shrink-0"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -208,18 +208,18 @@ export default function Home() {
                           d="M12 4v16m8-8H4"
                         />
                       </svg>
-                      <span className="text-sm">Receive</span>
+                      <span className="text-xs">Receive</span>
                     </button>
 
                     {/* Send Button */}
                     <button
                       onClick={() => setIsSendModalOpen(true)}
-                      className="flex-1 text-white font-medium py-3 px-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg hover:opacity-90 flex items-center justify-center gap-2"
+                      className="text-white font-medium py-3 px-2 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg hover:opacity-90 flex items-center justify-center gap-1.5"
                       style={{ backgroundColor: '#4ecdc4' }}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
+                        className="h-4 w-4 flex-shrink-0"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -231,19 +231,19 @@ export default function Home() {
                           d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
                         />
                       </svg>
-                      <span className="text-sm">Send</span>
+                      <span className="text-xs">Send</span>
                     </button>
 
                     {/* Cashback Calculator Button - Only for store owners */}
                     {userBusiness && (
                       <button
                         onClick={() => setIsCashbackModalOpen(true)}
-                        className="flex-1 text-gray-700 font-medium py-3 px-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg hover:opacity-90 flex items-center justify-center gap-2"
+                        className="text-gray-700 font-medium py-3 px-2 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg hover:opacity-90 flex items-center justify-center gap-1.5"
                         style={{ backgroundColor: '#ffd166' }}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
+                          className="h-4 w-4 flex-shrink-0"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -255,7 +255,7 @@ export default function Home() {
                             d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
                           />
                         </svg>
-                        <span className="text-sm">Cashback</span>
+                        <span className="text-xs">Cashback</span>
                       </button>
                     )}
                   </div>
