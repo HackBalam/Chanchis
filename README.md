@@ -192,7 +192,7 @@ The CHNC token is deployed on Celo Mainnet:
 | **Network** | Celo Mainnet |
 | **Explorer** | [View on Celoscan](https://celoscan.io/token/0xd85E17185cC11A02c7a8C5055FE7Cb6278Df9418) |
 
-## Gasless Transactions (EIP-2612 Permit)
+## Gasless Transactions (EIP-2612 Permit) "Thirdweb"
 
 Chanchis implements **gasless token transfers** using the EIP-2612 Permit standard. This allows users to send CHNC tokens without needing CELO for gas fees.
 
