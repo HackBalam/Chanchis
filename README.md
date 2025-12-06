@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://chanchis-web-pb1n.vercel.app/">Live Demo</a> •
+  <a href="[https://chanchis-web-pb1n.vercel.app/](https://farcaster.xyz/miniapps/cid2j1MItv1P/chanchis)">Live Demo</a> •
   <a href="#features">Features</a> •
   <a href="#installation">Installation</a> •
   <a href="#tech-stack">Tech Stack</a>
