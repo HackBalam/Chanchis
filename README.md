@@ -215,11 +215,11 @@ Chanchis implements **gasless token transfers** using the EIP-2612 Permit standa
        │──────────────────>│                   │
        │                   │                   │
        │                   │ 2. Submit Permit  │
-       │                   │    (pays gas)     │
+       │                   │(pays gas Thirdweb)│
        │                   │──────────────────>│
        │                   │                   │
        │                   │ 3. TransferFrom   │
-       │                   │    (pays gas)     │
+       │                   │(pays gas Thirdweb)│
        │                   │──────────────────>│
        │                   │                   │
        │                   │ 4. Confirmation   │
